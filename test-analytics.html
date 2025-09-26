@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Test - Fine Track</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .btn {
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            font-weight: 500;
+        }
+        .btn:hover {
+            background: #0284c7;
+        }
+        .status {
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-weight: 500;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        h1, h2 {
+            color: #1e293b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Fine Track Analytics Test Suite</h1>
+        
+        <div class="card">
+            <h2>Test Data Generation</h2>
+            <p>Generate sample transaction data to test the analytics functionality.</p>
+            <button class="btn" onclick="generateSampleData()">Generate Sample Data</button>
+            <button class="btn" onclick="clearData()">Clear All Data</button>
+            <div id="data-status"></div>
+        </div>
+
+        <div class="card">
+            <h2>Analytics Tests</h2>
+            <p>Test various analytics components and their functionality.</p>
+            <button class="btn" onclick="testCharts()">Test Chart Components</button>
+            <button class="btn" onclick="testFilters()">Test Period Filters</button>
+            <button class="btn" onclick="testInsights()">Test AI Insights</button>
+            <button class="btn" onclick="runAllTests()">Run All Tests</button>
+            <button class="btn" onclick="testAnalyticsUpdates()">Test Analytics Updates</button>
+            <div id="test-results"></div>
+        </div>
+
+        <div class="card">
+            <h2>Current Data Summary</h2>
+            <div id="data-summary"></div>
+        </div>
+
+        <div class="card">
+            <h2>Test Log</h2>
+            <pre id="test-log" style="max-height: 300px; overflow-y: auto; background: #f1f5f9; padding: 16px; border-radius: 8px; font-size: 12px;"></pre>
+        </div>
+    </div>
+
+    <script>
+        let testResults = [];
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            console.log(logEntry);
+            
+            const logElement = document.getElementById('test-log');
+            logElement.textContent += logEntry + '\n';
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function showStatus(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        function generateSampleData() {
+            log('Generating sample transaction data...');
+            
+            const categories = [
+                { id: 1, name: 'Food & Dining', icon: 'fas fa-utensils', color: '#ef4444' },
+                { id: 2, name: 'Transportation', icon: 'fas fa-car', color: '#f59e0b' },
+                { id: 3, name: 'Shopping', icon: 'fas fa-shopping-bag', color: '#8b5cf6' },
+                { id: 4, name: 'Entertainment', icon: 'fas fa-film', color: '#06b6d4' },
+                { id: 5, name: 'Utilities', icon: 'fas fa-bolt', color: '#10b981' },
+                { id: 6, name: 'Healthcare', icon: 'fas fa-heartbeat', color: '#f97316' },
+                { id: 7, name: 'Income', icon: 'fas fa-dollar-sign', color: '#22c55e' }
+            ];
+
+            const sampleTransactions = [];
+            const today = new Date();
+            
+            // Generate transactions for the last 90 days
+            for (let i = 0; i < 90; i++) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                
+                // Random number of transactions per day (0-5)
+                const dailyTransactions = Math.floor(Math.random() * 6);
+                
+                for (let j = 0; j < dailyTransactions; j++) {
+                    const isIncome = Math.random() < 0.15; // 15% chance of income
+                    const categoryId = isIncome ? 7 : Math.floor(Math.random() * 6) + 1;
+                    const category = categories.find(c => c.id === categoryId);
+                    
+                    const transaction = {
+                        id: Date.now() + Math.random() * 1000,
+                        amount: isIncome ? 
+                            Math.floor(Math.random() * 2000) + 1000 : 
+                            Math.floor(Math.random() * 200) + 10,
+                        type: isIncome ? 'income' : 'expense',
+                        description: getRandomDescription(category.name, isIncome),
+                        merchant: getRandomMerchant(category.name),
+                        category: category.name,
+                        category_id: categoryId,
+                        date: date.toISOString().split('T')[0],
+                        payment_method: getRandomPaymentMethod(),
+                        notes: Math.random() < 0.3 ? 'Sample transaction note' : null,
+                        created_at: date.toISOString(),
+                        updated_at: date.toISOString()
+                    };
+                    
+                    sampleTransactions.push(transaction);
+                }
+            }
+
+            // Save to localStorage
+            localStorage.setItem('transactions', JSON.stringify(sampleTransactions));
+            localStorage.setItem('categories', JSON.stringify(categories));
+            
+            log(`Generated ${sampleTransactions.length} sample transactions`);
+            showStatus('data-status', `✅ Generated ${sampleTransactions.length} transactions`, 'success');
+            updateDataSummary();
+        }
+
+        function getRandomDescription(category, isIncome) {
+            const descriptions = {
+                'Food & Dining': ['Grocery Store', 'Restaurant Dinner', 'Coffee Shop', 'Fast Food', 'Lunch Meeting'],
+                'Transportation': ['Gas Station', 'Uber Ride', 'Public Transit', 'Parking Fee', 'Car Maintenance'],
+                'Shopping': ['Online Purchase', 'Clothing Store', 'Electronics', 'Home Goods', 'Pharmacy'],
+                'Entertainment': ['Movie Theater', 'Concert Tickets', 'Streaming Service', 'Gaming', 'Sports Event'],
+                'Utilities': ['Electric Bill', 'Internet Service', 'Phone Bill', 'Water Bill', 'Trash Service'],
+                'Healthcare': ['Doctor Visit', 'Pharmacy', 'Dental Care', 'Vision Care', 'Medical Insurance'],
+                'Income': ['Salary Payment', 'Freelance Work', 'Investment Return', 'Gift', 'Bonus']
+            };
+            
+            const options = descriptions[category] || ['Transaction'];
+            return options[Math.floor(Math.random() * options.length)];
+        }
+
+        function getRandomMerchant(category) {
+            const merchants = {
+                'Food & Dining': ['Starbucks', 'McDonald\'s', 'Whole Foods', 'Local Restaurant', 'Subway'],
+                'Transportation': ['Shell', 'Uber', 'Metro Transit', 'City Parking', 'AutoZone'],
+                'Shopping': ['Amazon', 'Target', 'Best Buy', 'Home Depot', 'CVS Pharmacy'],
+                'Entertainment': ['AMC Theaters', 'Netflix', 'Spotify', 'Steam', 'Sports Arena'],
+                'Utilities': ['Electric Company', 'Comcast', 'Verizon', 'Water Department', 'Waste Management'],
+                'Healthcare': ['Medical Center', 'Walgreens', 'Dental Office', 'Vision Center', 'Insurance Co'],
+                'Income': ['Employer', 'Client', 'Investment Firm', 'Family', 'Company']
+            };
+            
+            const options = merchants[category] || ['Merchant'];
+            return options[Math.floor(Math.random() * options.length)];
+        }
+
+        function getRandomPaymentMethod() {
+            const methods = ['credit_card', 'debit_card', 'cash', 'bank_transfer'];
+            return methods[Math.floor(Math.random() * methods.length)];
+        }
+
+        function clearData() {
+            localStorage.removeItem('transactions');
+            localStorage.removeItem('categories');
+            log('Cleared all transaction data');
+            showStatus('data-status', '🗑️ All data cleared', 'info');
+            updateDataSummary();
+        }
+
+        function updateDataSummary() {
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+            
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            
+            const summary = `
+                <strong>Transactions:</strong> ${transactions.length}<br>
+                <strong>Categories:</strong> ${categories.length}<br>
+                <strong>Total Income:</strong> $${totalIncome.toFixed(2)}<br>
+                <strong>Total Expenses:</strong> $${totalExpenses.toFixed(2)}<br>
+                <strong>Net Amount:</strong> $${(totalIncome - totalExpenses).toFixed(2)}
+            `;
+            
+            document.getElementById('data-summary').innerHTML = summary;
+        }
+
+        function testCharts() {
+            log('Testing chart components...');
+            let passed = 0, total = 0;
+            
+            // Test 1: Chart.js availability
+            total++;
+            if (typeof Chart !== 'undefined') {
+                passed++;
+                log('✅ Chart.js library is available');
+            } else {
+                log('❌ Chart.js library not found');
+            }
+            
+            // Test 2: Canvas elements exist
+            const chartCanvases = ['trends-chart', 'category-chart', 'monthly-chart', 'budget-chart'];
+            chartCanvases.forEach(canvasId => {
+                total++;
+                const canvas = document.getElementById(canvasId);
+                if (canvas) {
+                    passed++;
+                    log(`✅ Canvas element '${canvasId}' found`);
+                } else {
+                    log(`❌ Canvas element '${canvasId}' not found`);
+                }
+            });
+            
+            // Test 3: Analytics manager availability
+            total++;
+            if (typeof window.analyticsManager !== 'undefined') {
+                passed++;
+                log('✅ Analytics manager is available');
+            } else {
+                log('❌ Analytics manager not found');
+            }
+            
+            showStatus('test-results', `Chart Tests: ${passed}/${total} passed`, passed === total ? 'success' : 'error');
+            return { passed, total };
+        }
+
+        function testFilters() {
+            log('Testing period filters...');
+            let passed = 0, total = 0;
+            
+            // Test 1: Filter select element exists
+            total++;
+            const filterSelect = document.getElementById('analytics-period');
+            if (filterSelect) {
+                passed++;
+                log('✅ Period filter select found');
+                
+                // Test 2: Filter has options
+                total++;
+                if (filterSelect.options.length > 0) {
+                    passed++;
+                    log(`✅ Filter has ${filterSelect.options.length} options`);
+                } else {
+                    log('❌ Filter has no options');
+                }
+                
+                // Test 3: Filter function exists
+                total++;
+                if (typeof updateAnalyticsPeriod === 'function') {
+                    passed++;
+                    log('✅ updateAnalyticsPeriod function exists');
+                } else {
+                    log('❌ updateAnalyticsPeriod function not found');
+                }
+            } else {
+                log('❌ Period filter select not found');
+            }
+            
+            showStatus('test-results', `Filter Tests: ${passed}/${total} passed`, passed === total ? 'success' : 'error');
+            return { passed, total };
+        }
+
+        function testInsights() {
+            log('Testing AI insights...');
+            let passed = 0, total = 0;
+            
+            // Test 1: Insights container exists
+            total++;
+            const insightsContainer = document.getElementById('financial-insights');
+            if (insightsContainer) {
+                passed++;
+                log('✅ Financial insights container found');
+            } else {
+                log('❌ Financial insights container not found');
+            }
+            
+            // Test 2: Top categories container exists
+            total++;
+            const categoriesContainer = document.getElementById('top-categories');
+            if (categoriesContainer) {
+                passed++;
+                log('✅ Top categories container found');
+            } else {
+                log('❌ Top categories container not found');
+            }
+            
+            // Test 3: Spending patterns container exists
+            total++;
+            const patternsContainer = document.getElementById('spending-patterns');
+            if (patternsContainer) {
+                passed++;
+                log('✅ Spending patterns container found');
+            } else {
+                log('❌ Spending patterns container not found');
+            }
+            
+            showStatus('test-results', `Insights Tests: ${passed}/${total} passed`, passed === total ? 'success' : 'error');
+            return { passed, total };
+        }
+
+        function testAnalyticsUpdates() {
+            log('Testing analytics updates after transaction changes...');
+            
+            // First, ensure we have some data
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            if (transactions.length === 0) {
+                log('❌ No transaction data found. Generate sample data first.');
+                showStatus('test-results', 'No transaction data found', 'error');
+                return;
+            }
+            
+            // Add a test transaction
+            const testTransaction = {
+                id: Date.now(),
+                amount: 50,
+                type: 'expense',
+                description: 'Test Analytics Update',
+                category: 'Food & Dining',
+                date: new Date().toISOString().split('T')[0],
+                created_at: new Date().toISOString()
+            };
+            
+            transactions.unshift(testTransaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            // Trigger analytics update if available
+            if (window.analyticsManager) {
+                window.analyticsManager.updateAnalytics();
+                log('✅ Analytics update triggered successfully');
+                showStatus('test-results', 'Analytics update test passed', 'success');
+            } else {
+                log('❌ Analytics manager not available');
+                showStatus('test-results', 'Analytics manager not available', 'error');
+            }
+            
+            // Remove test transaction
+            transactions.shift();
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            
+            updateDataSummary();
+        }
+
+        function runAllTests() {
+            log('Running complete analytics test suite...');
+            
+            const chartResults = testCharts();
+            const filterResults = testFilters();
+            const insightResults = testInsights();
+            
+            const totalPassed = chartResults.passed + filterResults.passed + insightResults.passed;
+            const totalTests = chartResults.total + filterResults.total + insightResults.total;
+            
+            log(`\n=== TEST SUMMARY ===`);
+            log(`Total Tests: ${totalTests}`);
+            log(`Passed: ${totalPassed}`);
+            log(`Failed: ${totalTests - totalPassed}`);
+            log(`Success Rate: ${((totalPassed / totalTests) * 100).toFixed(1)}%`);
+            
+            const isAllPassed = totalPassed === totalTests;
+            showStatus('test-results', 
+                `Overall: ${totalPassed}/${totalTests} tests passed (${((totalPassed/totalTests)*100).toFixed(1)}%)`, 
+                isAllPassed ? 'success' : 'error');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Analytics test suite initialized');
+            updateDataSummary();
+            
+            // Check if we can access the main app elements
+            setTimeout(() => {
+                const mainApp = document.getElementById('main-app');
+                if (mainApp) {
+                    log('✅ Main application detected - running in embedded mode');
+                } else {
+                    log('ℹ️ Running in standalone test mode');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

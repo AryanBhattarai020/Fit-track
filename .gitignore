@@ -1,0 +1,48 @@
+# Node and package directories
+node_modules/
+
+# Environment and secrets
+backend/.env
+*.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# SQLite database files
+backend/database/*.db
+backend/database/*.sqlite
+backend/database/*.sqlite3
+
+# Uploaded files and generated assets
+backend/uploads/
+
+# Coverage and test output
+coverage/
+.nyc_output/
+
+# Build and cache directories (general)
+dist/
+build/
+.cache/
+.temp/
+.tmp/
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# Python cache (used by simple dev server)
+__pycache__/
+
+# Misc
+*.swp
+*.swo

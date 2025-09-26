@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fine Track - Smart Expense Tracking</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <p>Loading Fine Track...</p>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="auth-page">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="logo">💰 Fine Track</div>
+                <h2>Welcome Back!</h2>
+                <p>Sign in to track your expenses with AI</p>
+            </div>
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="login-password" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('login-password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+                <div class="auth-link">
+                    Don't have an account? <a href="#" onclick="showRegister()">Sign up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Page -->
+    <div id="register-page" class="auth-page hidden">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="logo">💰 Fine Track</div>
+                <h2>Create Account</h2>
+                <p>Join thousands managing their finances smartly</p>
+            </div>
+            <form id="register-form" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="register-firstname">First Name</label>
+                        <input type="text" id="register-firstname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-lastname">Last Name</label>
+                        <input type="text" id="register-lastname" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="register-password" required minlength="8" oninput="checkPasswordStrength()">
+                        <button type="button" class="toggle-password" onclick="togglePassword('register-password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div id="password-strength" class="password-strength">
+                        <div class="strength-bar">
+                            <div id="strength-progress" class="strength-progress"></div>
+                        </div>
+                        <div id="strength-text" class="strength-text">Enter password</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="register-income">Monthly Income (Optional)</label>
+                    <input type="number" id="register-income" step="0.01" placeholder="0.00">
+                </div>
+                <button type="submit" class="btn btn-primary">Create Account</button>
+                <div class="auth-link">
+                    Already have an account? <a href="#" onclick="showLogin()">Sign in</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app" class="main-app hidden">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">💰 Fine Track</div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-page="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#" class="nav-link" data-page="transactions">
+                    <i class="fas fa-list"></i> Transactions
+                </a>
+                <a href="#" class="nav-link" data-page="add-transaction">
+                    <i class="fas fa-plus"></i> Add Transaction
+                </a>
+                <a href="#" class="nav-link" data-page="categories">
+                    <i class="fas fa-tags"></i> Categories
+                </a>
+                <a href="#" class="nav-link" data-page="analytics">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <div class="user-details">
+                        <div id="user-name">User Name</div>
+                        <div id="user-email">user@email.com</div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-title">
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="header-info">
+                    <div class="health-score">
+                        <div class="health-label">Financial Health</div>
+                        <div id="health-score" class="health-value">85/100</div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="content">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+                            <div class="stat-info">
+                                <div class="stat-label">Total Balance</div>
+                                <div id="total-balance" class="stat-value">$0.00</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon expense"><i class="fas fa-arrow-down"></i></div>
+                            <div class="stat-info">
+                                <div class="stat-label">This Month</div>
+                                <div id="month-expenses" class="stat-value">$0.00</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon budget"><i class="fas fa-piggy-bank"></i></div>
+                            <div class="stat-info">
+                                <div class="stat-label">Budget Left</div>
+                                <div id="budget-remaining" class="stat-value">$0.00</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon savings"><i class="fas fa-chart-line"></i></div>
+                            <div class="stat-info">
+                                <div class="stat-label">Savings Goal</div>
+                                <div id="savings-progress" class="stat-value">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-content">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Recent Transactions</h3>
+                                <button class="btn btn-sm" onclick="showPage('add-transaction')">Add New</button>
+                            </div>
+                            <div class="card-body">
+                                <div id="recent-transactions" class="transactions-list">
+                                    <div class="empty-state">
+                                        <i class="fas fa-receipt"></i>
+                                        <p>No transactions yet</p>
+                                        <p>Start by adding your first expense!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transactions Page -->
+                <div id="transactions-page" class="page">
+                    <div class="page-header">
+                        <div class="page-actions">
+                            <button class="btn btn-primary" onclick="showPage('add-transaction')">
+                                <i class="fas fa-plus"></i> Add Transaction
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>All Transactions</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="transactions-list" class="transactions-list">
+                                <!-- Transactions will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Transaction Page -->
+                <div id="add-transaction-page" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Add New Transaction</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="transaction-form" class="form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="amount">Amount *</label>
+                                        <input type="number" id="amount" step="0.01" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="type">Type</label>
+                                        <select id="type">
+                                            <option value="expense">Expense</option>
+                                            <option value="income">Income</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Description *</label>
+                                    <input type="text" id="description" required>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="merchant">Merchant/Store</label>
+                                        <input type="text" id="merchant">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="category">Category</label>
+                                        <select id="category">
+                                            <option value="">Select Category</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="date">Date</label>
+                                        <input type="date" id="date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="payment-method">Payment Method</label>
+                                        <select id="payment-method">
+                                            <option value="cash">Cash</option>
+                                            <option value="credit_card">Credit Card</option>
+                                            <option value="debit_card">Debit Card</option>
+                                            <option value="bank_transfer">Bank Transfer</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="notes">Notes</label>
+                                    <textarea id="notes" rows="3"></textarea>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="button" class="btn btn-secondary" onclick="showPage('dashboard')">Cancel</button>
+                                    <button type="submit" class="btn btn-primary">Add Transaction</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories Page -->
+                <div id="categories-page" class="page">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Categories</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="categories-grid" class="categories-grid">
+                                <!-- Categories will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analytics-page" class="page">
+                    <!-- Analytics Header -->
+                    <div class="analytics-header">
+                        <div class="analytics-summary">
+                            <div class="summary-card total">
+                                <div class="summary-icon"><i class="fas fa-chart-line"></i></div>
+                                <div class="summary-info">
+                                    <div class="summary-value" id="analytics-total-transactions">0</div>
+                                    <div class="summary-label">Total Transactions</div>
+                                </div>
+                            </div>
+                            <div class="summary-card income">
+                                <div class="summary-icon"><i class="fas fa-arrow-up"></i></div>
+                                <div class="summary-info">
+                                    <div class="summary-value" id="analytics-total-income">$0.00</div>
+                                    <div class="summary-label">Total Income</div>
+                                </div>
+                            </div>
+                            <div class="summary-card expense">
+                                <div class="summary-icon"><i class="fas fa-arrow-down"></i></div>
+                                <div class="summary-info">
+                                    <div class="summary-value" id="analytics-total-expenses">$0.00</div>
+                                    <div class="summary-label">Total Expenses</div>
+                                </div>
+                            </div>
+                            <div class="summary-card average">
+                                <div class="summary-icon"><i class="fas fa-calculator"></i></div>
+                                <div class="summary-info">
+                                    <div class="summary-value" id="analytics-avg-transaction">$0.00</div>
+                                    <div class="summary-label">Average Transaction</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Time Filter -->
+                        <div class="analytics-filters">
+                            <div class="filter-group">
+                                <label>Time Period:</label>
+                                <select id="analytics-period" onchange="updateAnalyticsPeriod(this.value)">
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30" selected>Last 30 Days</option>
+                                    <option value="90">Last 3 Months</option>
+                                    <option value="365">Last Year</option>
+                                    <option value="all">All Time</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="analytics-grid">
+                        <!-- Spending Trends Chart -->
+                        <div class="analytics-card large">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-area"></i> Spending Trends</h3>
+                                <div class="chart-legend">
+                                    <span class="legend-item income"><span class="legend-color"></span>Income</span>
+                                    <span class="legend-item expense"><span class="legend-color"></span>Expenses</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="trends-chart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Category Breakdown -->
+                        <div class="analytics-card medium">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-pie"></i> Category Breakdown</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="category-chart" width="300" height="300"></canvas>
+                                <div id="category-legend" class="category-legend"></div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly Comparison -->
+                        <div class="analytics-card medium">
+                            <div class="card-header">
+                                <h3><i class="fas fa-chart-bar"></i> Monthly Comparison</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="monthly-chart" width="300" height="250"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Top Categories -->
+                        <div class="analytics-card small">
+                            <div class="card-header">
+                                <h3><i class="fas fa-trophy"></i> Top Categories</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="top-categories" class="top-categories-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- Spending Patterns -->
+                        <div class="analytics-card small">
+                            <div class="card-header">
+                                <h3><i class="fas fa-clock"></i> Spending Patterns</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="spending-patterns" class="patterns-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- Budget Analysis -->
+                        <div class="analytics-card large">
+                            <div class="card-header">
+                                <h3><i class="fas fa-bullseye"></i> Budget vs Actual</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="budget-chart" width="400" height="180"></canvas>
+                                <div class="budget-insights" id="budget-insights"></div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Insights -->
+                        <div class="analytics-card full-width">
+                            <div class="card-header">
+                                <h3><i class="fas fa-lightbulb"></i> AI-Powered Insights</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="financial-insights" class="insights-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Alert/Toast Messages -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
