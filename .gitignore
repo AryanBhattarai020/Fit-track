@@ -46,3 +46,6 @@ __pycache__/
 # Misc
 *.swp
 *.swo
+ 
+# Ignore nested git repo directory to avoid embedding it
+frontend/
